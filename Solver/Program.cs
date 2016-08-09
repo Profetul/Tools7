@@ -22,8 +22,8 @@ namespace Solver
         public int OeisId { get; set; }
         public int InStreamIndex { get; set; }
         public int InSectionIndex { get; set; }
-        public Word RuneWord { get; set; }
-        public Word CribWord { get; set; }
+        public string RuneWord { get; set; }
+        public string CribWord { get; set; }
 
     }
 
@@ -121,8 +121,8 @@ namespace Solver
                         OeisId = sequence.OeisId,
                         InSectionIndex = characterIndex,
                         InStreamIndex = resultIndex,
-                        RuneWord = runeWord,
-                        CribWord = cribWord
+                        RuneWord = runeWord.ToString(),
+                        CribWord = cribWord.ToString()
                     });
                 }
             }
