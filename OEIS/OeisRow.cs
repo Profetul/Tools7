@@ -25,7 +25,7 @@ namespace OEIS
         private int _cachedLength;
 
 
-        public int FindPattern(string stringPattern, byte[] bytesPattern, int sizeLimit = 150)
+        public int FindPattern(string stringPattern, int sizeLimit = 150)
         {
             lock (_syncRoot)
             {
@@ -43,11 +43,7 @@ namespace OEIS
                 }
             }
 
-            if (_cachedValue.Contains(stringPattern))
-            {
-                return PatternAt(_cachedMod29, bytesPattern).First();
-            }
-            return -1;
+            return _cachedValue.IndexOf(stringPattern) / 3;
         }
 
         private static IEnumerable<int> PatternAt(byte[] source, byte[] pattern)

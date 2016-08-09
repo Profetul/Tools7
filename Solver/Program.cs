@@ -9,15 +9,32 @@ using SQLite.Net.Platform.Win32;
 using Cryptanalysis;
 using OEIS;
 using System.IO;
+using Newtonsoft.Json;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Solver
 {
+    public class Result
+    {
+        public int SectionIndex { get; set; }
+        public string PatterName { get; set; }
+        public int OeisId { get; set; }
+        public int InStreamIndex { get; set; }
+        public int InSectionIndex { get; set; }
+        public Word RuneWord { get; set; }
+        public Word CribWord { get; set; }
+
+    }
+
+
     class Program
     {
         private static object syncRoot = new object();
         private static OEIS.OeisRow[] sequences;
         private static WordDictionary dictionary = new WordDictionary();
         private static Book book = new Book();
+        private static List<Result> resultStore = new List<Result>();
         static void Main(string[] args)
         {
             Initialize();
@@ -38,7 +55,7 @@ namespace Solver
             oeisDB.Close();
 
             dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
-            //dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
+            dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
 
         }
 
@@ -47,63 +64,68 @@ namespace Solver
             for (int sectionIndex = 7; sectionIndex < book.Sections.Count - 2; sectionIndex++)
             {
                 var section = book.Sections[sectionIndex];
-                var sizeLimit = section.Characters.Count;
+                var stringSectionCharacters = String.Join("", section.Characters);
+                var sizeLimit = section.Characters.Count + stringSectionCharacters.Count(w => w == 'F') + 10;
                 var wordLength = 4;// section.Words.Max(w => w.Count);
                 var runeWords = section.Words.Where(w => w.Count == wordLength).ToList();
                 var cribWords = dictionary.Where(w => w.Key.Count == wordLength).Select(w => w.Key).ToList();
+                long counter = 0;
                 foreach (var cribWord in cribWords)
                 {
                     foreach (var runeWord in runeWords)
                     {
-                        //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-                        //sw.Start();
+                        var characterIndex = stringSectionCharacters.IndexOf(String.Join("", runeWord));
+                        var maxDelta = stringSectionCharacters.Take(characterIndex).Count(w => w == 'F') + 10;
 
                         var x1 = (runeWord | cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
                         var strX1 = BitConverter.ToString(x1);
                         var x2 = (runeWord | !cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
                         var strX2 = BitConverter.ToString(x2);
-                        var x3 = (!runeWord | cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX3 = BitConverter.ToString(x3);
-                        var x4 = (!runeWord | !cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX4 = BitConverter.ToString(x4);
 
                         Parallel.ForEach(sequences,
                         sequence =>
                         {
-                            CheckSequence(sequence, strX1, x1, sizeLimit, sectionIndex, runeWord, cribWord, "runeWord_cribWord");
-                            CheckSequence(sequence, strX2, x2, sizeLimit, sectionIndex, runeWord, cribWord, "runeWord_not_cribWord");
-                            CheckSequence(sequence, strX3, x3, sizeLimit, sectionIndex, runeWord, cribWord, "not_runeWord_cribWord");
-                            CheckSequence(sequence, strX4, x4, sizeLimit, sectionIndex, runeWord, cribWord, "not_runeWord_not_cribWord");
+                            CheckSequence(sequence, strX1, sizeLimit, characterIndex, maxDelta, sectionIndex, runeWord, cribWord, "runeWord_cribWord");
+                            CheckSequence(sequence, strX2, sizeLimit, characterIndex, maxDelta, sectionIndex, runeWord, cribWord, "runeWord_not_cribWord");
                         });
 
-                        //sw.Stop();
+                        counter++;
+                        if (counter % 1000 == 0)
+                        {
+                            lock (syncRoot)
+                            {
+                                File.WriteAllText(@"..\Results\StreamSearch4.txt", JsonConvert.SerializeObject(resultStore));
+                            }
+                        }
                     }
+
+                }
+                lock (syncRoot)
+                {
+                    File.WriteAllText(@"..\Results\StreamSearch4.txt", JsonConvert.SerializeObject(resultStore));
                 }
             }
         }
 
-        private static void CheckSequence(OeisRow sequence, string stringPattern, byte[] bytePattern, int sizeLimit, int sectionIndex, Word runeWord, Word cribWord, string patternName)
+        private static void CheckSequence(OeisRow sequence, string stringPattern, int sizeLimit, int characterIndex, int maxDelta, int sectionIndex, Word runeWord, Word cribWord, string patternName)
         {
-            //System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-            //sw.Start();
-            int result = sequence.FindPattern(stringPattern, bytePattern, sizeLimit * 2);
-            if (result > 0)
+            int resultIndex = sequence.FindPattern(stringPattern, sizeLimit);
+            if (resultIndex > 0 && resultIndex - maxDelta <= characterIndex)
             {
                 lock (syncRoot)
                 {
-                    var outputData = String.Format("{0},{1},{2},{3},{4},{5},{6},{7}\r\n",
-                        sectionIndex,
-                        patternName,
-                        sequence.OeisId,
-                        result,
-                        runeWord.Count,
-                        runeWord.ToString(),
-                        cribWord.ToString(),
-                        String.Join("-", bytePattern));
-                    File.AppendAllText(String.Format("..\\Results\\{0}_{1}.txt", sectionIndex, patternName), outputData);
+                    resultStore.Add(new Result
+                    {
+                        SectionIndex = sectionIndex,
+                        PatterName = patternName,
+                        OeisId = sequence.OeisId,
+                        InSectionIndex = characterIndex,
+                        InStreamIndex = resultIndex,
+                        RuneWord = runeWord,
+                        CribWord = cribWord
+                    });
                 }
             }
-            //sw.Stop();
         }
     }
 }
