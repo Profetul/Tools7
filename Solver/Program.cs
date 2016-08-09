@@ -55,13 +55,14 @@ namespace Solver
             oeisDB.Close();
 
             dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
-            dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
+            dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
+            //dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
 
         }
 
         private static void Processor()
         {
-            for (int sectionIndex = 7; sectionIndex < book.Sections.Count - 2; sectionIndex++)
+            for (int sectionIndex = 8; sectionIndex < book.Sections.Count - 2; sectionIndex++)
             {
                 var section = book.Sections[sectionIndex];
                 var stringSectionCharacters = String.Join("", section.Characters);
@@ -90,20 +91,30 @@ namespace Solver
                         });
 
                         counter++;
-                        if (counter % 1000 == 0)
+                        if (counter % cribWords.Count == 0)
                         {
-                            lock (syncRoot)
+                            Task.Factory.StartNew(() =>
                             {
-                                File.WriteAllText(@"..\Results\StreamSearch4.txt", JsonConvert.SerializeObject(resultStore));
-                            }
+                                List<Result> temp;
+                                lock (syncRoot)
+                                {
+                                    temp = resultStore.ToList();
+                                }
+                                File.WriteAllText(@"..\Results\StreamSearch4.json", JsonConvert.SerializeObject(temp));
+                            });
                         }
                     }
 
                 }
-                lock (syncRoot)
+                Task.Factory.StartNew(() =>
                 {
-                    File.WriteAllText(@"..\Results\StreamSearch4.txt", JsonConvert.SerializeObject(resultStore));
-                }
+                    List<Result> temp;
+                    lock (syncRoot)
+                    {
+                        temp = resultStore.ToList();
+                    }
+                    File.WriteAllText(@"..\Results\StreamSearch4.json", JsonConvert.SerializeObject(temp));
+                });
             }
         }
 
