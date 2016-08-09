@@ -16,7 +16,7 @@ namespace OEIS
 
         private bool _initialized;
 
-        private object _syncRoot;
+        private object _syncRoot = new object();
 
         private byte[] _cachedMod29;
 
@@ -25,7 +25,7 @@ namespace OEIS
         private int _cachedLength;
 
 
-        public int FindPattern(int[] pattern, int sizeLimit = 150)
+        public int FindPattern(string stringPattern, byte[] bytesPattern, int sizeLimit = 150)
         {
             lock (_syncRoot)
             {
@@ -43,9 +43,7 @@ namespace OEIS
                 }
             }
 
-            byte[] bytesPattern = pattern.Select(val => val < 0 ? (byte)((29 + val) % 29) : (byte)(val % 29)).ToArray();
-            var valueToCheck = BitConverter.ToString(bytesPattern);
-            if (_cachedValue.Contains(valueToCheck))
+            if (_cachedValue.Contains(stringPattern))
             {
                 return PatternAt(_cachedMod29, bytesPattern).First();
             }

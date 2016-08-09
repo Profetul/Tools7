@@ -11,6 +11,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptanalysis", "Ciphers\Cr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solver", "Solver\Solver.csproj", "{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataSources", "DataSources", "{FB53E7E1-E841-4244-B52E-A422981DABB9}"
+	ProjectSection(SolutionItems) = preProject
+		DataSources\CicadaSentences.txt = DataSources\CicadaSentences.txt
+		DataSources\CicadaSpeak.txt = DataSources\CicadaSpeak.txt
+		DataSources\Koans.txt = DataSources\Koans.txt
+		DataSources\liber-master = DataSources\liber-master
+		DataSources\liber-shortend = DataSources\liber-shortend
+		DataSources\MasterMind.txt = DataSources\MasterMind.txt
+		DataSources\Primes.txt = DataSources\Primes.txt
+		DataSources\Titles.txt = DataSources\Titles.txt
+		DataSources\WordList.txt = DataSources\WordList.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

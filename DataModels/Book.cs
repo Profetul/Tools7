@@ -89,7 +89,7 @@ namespace DataModels
             }
         }
 
-        public void Initialize(string filePath)
+        public void LoadFromFile(string filePath)
         {
             if (_isInitialized)
             {
