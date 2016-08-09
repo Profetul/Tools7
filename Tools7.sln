@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModels", "DataModels\DataModels.csproj", "{60593D8C-11E2-4E84-B5B3-70A619A4A1D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OEIS", "OEIS\OEIS.csproj", "{3ABC9256-623E-41C1-99FE-23AEA7FBD94D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptanalysis", "Ciphers\Cryptanalysis.csproj", "{670C2894-A5B6-45AA-86F4-588A0A59D224}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solver", "Solver\Solver.csproj", "{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60593D8C-11E2-4E84-B5B3-70A619A4A1D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60593D8C-11E2-4E84-B5B3-70A619A4A1D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60593D8C-11E2-4E84-B5B3-70A619A4A1D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60593D8C-11E2-4E84-B5B3-70A619A4A1D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ABC9256-623E-41C1-99FE-23AEA7FBD94D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ABC9256-623E-41C1-99FE-23AEA7FBD94D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ABC9256-623E-41C1-99FE-23AEA7FBD94D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ABC9256-623E-41C1-99FE-23AEA7FBD94D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670C2894-A5B6-45AA-86F4-588A0A59D224}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670C2894-A5B6-45AA-86F4-588A0A59D224}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670C2894-A5B6-45AA-86F4-588A0A59D224}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670C2894-A5B6-45AA-86F4-588A0A59D224}.Release|Any CPU.Build.0 = Release|Any CPU
+		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
