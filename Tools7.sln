@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataSources", "DataSources"
 		DataSources\WordList.txt = DataSources\WordList.txt
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analyzer", "Analyzer\Analyzer.csproj", "{C31F6D3F-1BD2-48A4-A2E4-30A40D787C11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{500B479E-DF08-4B43-83A8-5E36CBE3FCE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C31F6D3F-1BD2-48A4-A2E4-30A40D787C11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C31F6D3F-1BD2-48A4-A2E4-30A40D787C11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C31F6D3F-1BD2-48A4-A2E4-30A40D787C11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C31F6D3F-1BD2-48A4-A2E4-30A40D787C11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
