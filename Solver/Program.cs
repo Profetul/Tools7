@@ -94,23 +94,29 @@ namespace Solver
                         });
 
                         counter++;
-                        if (counter % runeWord.Count == 0)
+                        if (counter % 622 == 0)
                         {
                             counter = 0;
                             Task.Factory.StartNew(() =>
                             {
                                 lock (syncRoot)
                                 {
-                                    List<IGrouping<string, Result>> temp = resultStore.GroupBy(g => String.Format("{0}-{1}", g.OeisId, g.PatterName)).Where(k => k.Select(d => d.RuneWord).Distinct().Count() > (runeWords.Count * 0.33)).ToList();
-                                    if (temp.Count > 0)
+                                    List<IGrouping<string, Result>> temp1 = resultStore.GroupBy(g => String.Format("{0}-{1}", g.OeisId, g.PatterName)).Where(k => k.Select(d => d.RuneWord).Distinct().Count() > (runeWords.Count * 0.33)).ToList();
+                                    if (temp1.Count > 0)
                                     {
-                                        File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + "_light.json", JsonConvert.SerializeObject(temp));
+                                        File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + "_light.json", JsonConvert.SerializeObject(temp1));
                                     }
                                 }
                             });
                         }
                     }
 
+                }
+
+                List<IGrouping<string, Result>> temp = resultStore.GroupBy(g => String.Format("{0}-{1}", g.OeisId, g.PatterName)).Where(k => k.Select(d => d.RuneWord).Distinct().Count() > (runeWords.Count * 0.33)).ToList();
+                if (temp.Count > 0)
+                {
+                    File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + "_light.json", JsonConvert.SerializeObject(temp));
                 }
                 File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + ".json", JsonConvert.SerializeObject(resultStore));
             }
