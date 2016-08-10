@@ -62,15 +62,18 @@ namespace Solver
 
         private static void Processor()
         {
-            for (int sectionIndex = 8; sectionIndex < book.Sections.Count - 2; sectionIndex++)
+            for (int sectionIndex = 9; sectionIndex < book.Sections.Count - 2; sectionIndex++)
             {
+                resultStore = new List<Result>();
+                long counter = 0;
+                GC.Collect();
                 var section = book.Sections[sectionIndex];
                 var stringSectionCharacters = String.Join("", section.Characters);
                 var sizeLimit = section.Characters.Count + stringSectionCharacters.Count(w => w == 'F') + 10;
                 var wordLength = 4;// section.Words.Max(w => w.Count);
                 var runeWords = section.Words.Where(w => w.Count == wordLength).ToList();
                 var cribWords = dictionary.Where(w => w.Key.Count == wordLength).Select(w => w.Key).ToList();
-                long counter = 0;
+
                 foreach (var cribWord in cribWords)
                 {
                     foreach (var runeWord in runeWords)
@@ -91,32 +94,29 @@ namespace Solver
                         });
 
                         counter++;
-                        if (counter % cribWords.Count == 0)
+                        if (counter % runeWord.Count == 0)
                         {
+                            counter = 0;
                             Task.Factory.StartNew(() =>
                             {
-                                List<Result> temp;
                                 lock (syncRoot)
                                 {
-                                    temp = resultStore.ToList();
+                                    List<IGrouping<string, Result>> temp = resultStore.GroupBy(g => String.Format("{0}-{1}", g.OeisId, g.PatterName)).Where(k => k.Select(d => d.RuneWord).Distinct().Count() > (runeWords.Count * 0.33)).ToList();
+                                    if (temp.Count > 0)
+                                    {
+                                        File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + "_light.json", JsonConvert.SerializeObject(temp));
+                                    }
                                 }
-                                File.WriteAllText(@"..\Results\StreamSearch4.json", JsonConvert.SerializeObject(temp));
                             });
                         }
                     }
 
                 }
-                Task.Factory.StartNew(() =>
-                {
-                    List<Result> temp;
-                    lock (syncRoot)
-                    {
-                        temp = resultStore.ToList();
-                    }
-                    File.WriteAllText(@"..\Results\StreamSearch4.json", JsonConvert.SerializeObject(temp));
-                });
+                File.WriteAllText(@"..\Results\" + sectionIndex + "_" + wordLength + ".json", JsonConvert.SerializeObject(resultStore));
             }
         }
+
+
 
         private static void CheckSequence(OeisRow sequence, string stringPattern, int sizeLimit, int characterIndex, int maxDelta, int sectionIndex, Word runeWord, Word cribWord, string patternName)
         {
