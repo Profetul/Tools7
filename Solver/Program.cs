@@ -57,17 +57,17 @@ namespace Solver
 
         private static void Processor()
         {
-            int paragraphIndex = book.Paragraphs.IndexOf(book.Sections[7][0]);
+            int paragraphIndex = 25;// book.Paragraphs.IndexOf(book.Sections[9][0]);
             int maxIndex = book.Paragraphs.IndexOf(book.Sections[book.Sections.Count - 3][0]) - 1;
             int wordIndex = 0;
-            int cribIndex = 0;
+            int cribIndex = 43;
             int sizeLimit = 13000;
 
             while (paragraphIndex < maxIndex)
             {
                 var paragraph = book.Paragraphs[paragraphIndex];
                 var stringCharacters = String.Join("", paragraph.Characters);
-                var wordLength = paragraph.Words.Max(w => w.Count);
+                var wordLength = Math.Max(7, paragraph.Words.Max(w => w.Count));
                 var runeWords = paragraph.Words.Where(w => w.Count == wordLength).ToList();
                 var cribWords = dictionary.Where(w => w.Key.Count == wordLength).Select(w => w.Key).ToList();
                 while (wordIndex < runeWords.Count)
@@ -81,17 +81,17 @@ namespace Solver
                         var cribWord = cribWords[cribIndex];
                         var cribWordString = cribWord.ToString();
                         var x1 = (runeWord | cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX1 = BitConverter.ToString(x1);
+                        var strX1 = "-" + String.Join("-", x1) + "-";
 
                         var x2 = (runeWord | !cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX2 = BitConverter.ToString(x2);
+                        var strX2 = "-" + String.Join("-", x2) + "-";
 
 
                         var x3 = (runeWord | cribWord.Reverced).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX3 = BitConverter.ToString(x1);
+                        var strX3 = "-" + String.Join("-", x3) + "-";
 
                         var x4 = (runeWord | !(cribWord.Reverced)).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX4 = BitConverter.ToString(x2);
+                        var strX4 = "-" + String.Join("-", x4) + "-";
 
                         Parallel.ForEach(sequences,
                         sequence =>
@@ -112,7 +112,6 @@ namespace Solver
             }
 
         }
-
 
         private static void CheckSequence(OeisRow sequence, string stringPattern, int sizeLimit, int characterIndex, int refIndex, string runeWord, string cribWord, string patternName)
         {
