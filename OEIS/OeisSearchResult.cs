@@ -19,7 +19,7 @@ namespace OEIS
                 if (String.IsNullOrWhiteSpace(_id))
                 {
                     _id = String.Format("{0},{1},{2},{3},{4}",
-                        SectionIndex,
+                        RefIndex,
                         PatterName,
                         OeisId,
                         InStreamIndex,
@@ -34,7 +34,7 @@ namespace OEIS
         }
 
         [Indexed]
-        public int SectionIndex { get; set; }
+        public int RefIndex { get; set; }
 
         [Indexed]
         public string PatterName { get; set; }
