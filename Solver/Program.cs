@@ -51,7 +51,7 @@ namespace Solver
             dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
             dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
             dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
-            dictionary.LoadFromFile(@"..\DataSources\WordList.txt");
+            //dictionary.LoadFromFile(@"..\DataSources\WordList.txt");
 
         }
 
