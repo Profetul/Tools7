@@ -194,9 +194,9 @@ namespace Cryptanalysis
                 }
 
             }
-            return counter.Where(n => n.Value.Count > 1).OrderByDescending(n => n.Value.Count).ToDictionary(k => k.Key, v => v.Value);
+            return counter.Where(n => n.Value.Count > 0).OrderByDescending(n => n.Value.Count).ToDictionary(k => k.Key, v => v.Value);
         }
-        public static Dictionary<Word, List<int>> NGrams(this List<Character> characters, int nGrams = 2)
+        public static Dictionary<Word, List<int>> NGramPairs(this List<Character> characters, int nGrams = 2)
         {
             if (nGrams < 2)
             {
