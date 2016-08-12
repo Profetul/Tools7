@@ -20,16 +20,20 @@ namespace Analyzer
         {
             book.LoadFromFile(@"..\DataSources\liber-master");
             WordDictionary dictionary = new WordDictionary();
-            dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
-            dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
-            dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
+            //dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
+            //dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
+            //dictionary.LoadFromFile(@"..\DataSources\WordList.txt");
+            StringBuilder sb = new StringBuilder();
             for (int secIndex = 7; secIndex < book.Sections.Count - 2; secIndex++)
             {
-                var section = book.Sections[secIndex];
-                foreach (Word word in section.Words)
-                {
-                    var cribs = dictionary.Where(d => d.Key.PrimeSum == word.PrimeSum).ToList();
-                }
+                //var section = book.Sections[secIndex];
+                //foreach (Word word in section.Words)
+                //{
+                //    var cribs = dictionary.Where(d => d.Key.PrimeSum == word.PrimeSum).ToList();
+                //}
+                sb.AppendLine("--- Start Page " + (secIndex - 7) + " --- ");
+                sb.AppendLine(book.Sections[secIndex].ToPrimeSumString());
+                sb.AppendLine(" --- End Page " + (secIndex - 7) + " --- \r\n");
             }
         }
     }

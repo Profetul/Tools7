@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,6 +42,15 @@ namespace DataModels
                 return this.Select(c => c.PrimeSum).Sum();
             }
         }
+
+        public BigInteger PrimeMult
+        {
+            get
+            {
+                return this.Where(p => p.PrimeSum > 0).Aggregate((BigInteger)1, (a, c) => BigInteger.Multiply(a, c.PrimeSum));
+            }
+        }
+
 
         private List<Word> _words;
         public List<Word> Words
@@ -103,8 +113,13 @@ namespace DataModels
 
         public string ToPrimeSumString()
         {
-            return String.Join("\r\n", this.Select(s => s.ToPrimeSumString())) + "\r\nParagraph Total: " + PrimeSum + "\r\n";
+            return String.Join("\r\n", this.Where(p => p.PrimeSum > 0).Select(s => s.ToPrimeSumString())) + "\r\nParagraph Total (sum): " + PrimeSum + "\r\nParagraph Total (mult): " + PrimeMult + "\r\n";
         }
 
+
+        public string ToPrimesString()
+        {
+            return String.Join(".\r\n", this.Select(c => c.ToPrimesString())) + ".\r\n";
+        }
     }
 }

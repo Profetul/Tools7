@@ -35,7 +35,7 @@ namespace DataModels
             }
         }
 
-        public long RuneSum
+        public long PrimeSum
         {
             get
             {

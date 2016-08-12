@@ -155,6 +155,11 @@ namespace DataModels
             return String.Join(" ", this.Where(w => w.Any(c => c.Type == CharacterType.Rune)).Select(w => w.PrimeSum)) + " = " + PrimeSum + ".";
         }
 
+        public string ToPrimesString()
+        {
+            return String.Join(" ", this.Where(w => w.Any(c => c.Type == CharacterType.Rune)).Select(c => c.ToPrimesString()));
+        }
+
         public override int GetHashCode()
         {
             return String.Join(" ", Words.ToString()).GetHashCode();

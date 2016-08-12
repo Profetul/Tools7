@@ -182,6 +182,11 @@ namespace DataModels
         {
             return Latin;
         }
+
+        public string ToPrimesString()
+        {
+            return String.Join("-", this.Select(c => c.PrimeValue));
+        }
     }
 
 }
