@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OEIS;
+using DataModels;
+using Cryptanalysis;
 using SQLite.Net;
 using SQLite.Net.Platform.Win32;
 using System;
@@ -13,20 +15,22 @@ namespace Analyzer
 {
     class Program
     {
+        static Book book = new Book();
         static void Main(string[] args)
         {
-            SQLiteConnectionWithLock resultsDB = new SQLiteConnectionWithLock(
-              new SQLitePlatformWin32(),
-              new SQLiteConnectionString(@"c:\temp\results.db", true)
-              );
-            string json = File.ReadAllText(@"C:\Users\xbox1\Documents\GitHub\Tools7\Results\9_4_light.json");
-            List<List<OeisSearchResult>> oeisresults = JsonConvert.DeserializeObject<List<List<OeisSearchResult>>>(json);
-            List<OeisSearchResult> results = oeisresults.Aggregate(new List<OeisSearchResult>(), (a, n) =>
+            book.LoadFromFile(@"..\DataSources\liber-master");
+            WordDictionary dictionary = new WordDictionary();
+            ictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
+            dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
+            dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
+            for (int secIndex = 7; secIndex < book.Sections.Count - 2; secIndex++)
             {
-                a.AddRange(n);
-                return a;
-            });
-            resultsDB.InsertOrIgnoreAll(results);
+                var section = book.Sections[secIndex];
+                foreach (Word word in section.Words)
+                {
+                    var cribs = dictionary.Where(d => d.Key.PrimeSum == word.PrimeSum).ToList();
+                }
+            }
         }
     }
 }

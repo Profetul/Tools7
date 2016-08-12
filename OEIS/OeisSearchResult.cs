@@ -12,25 +12,10 @@ namespace OEIS
         private string _id;
 
         [PrimaryKey]
-        public string ID
+        [AutoIncrement]
+        public int ID
         {
-            get
-            {
-                if (String.IsNullOrWhiteSpace(_id))
-                {
-                    _id = String.Format("{0},{1},{2},{3},{4}",
-                        RefIndex,
-                        PatterName,
-                        OeisId,
-                        InStreamIndex,
-                        InSectionIndex);
-                }
-                return _id;
-            }
-            set
-            {
-                _id = value;
-            }
+            get; set;
         }
 
         [Indexed]
@@ -42,14 +27,12 @@ namespace OEIS
         [Indexed]
         public int OeisId { get; set; }
 
-        [Indexed]
-        public int InStreamIndex { get; set; }
-
-        [Indexed]
-        public int InSectionIndex { get; set; }
-
         public string RuneWord { get; set; }
+
         public string CribWord { get; set; }
+
+        public string Pattern { get; set; }
+
 
     }
 }

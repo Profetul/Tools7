@@ -34,11 +34,11 @@ namespace DataModels
             }
         }
 
-        public long RuneSum
+        public long PrimeSum
         {
             get
             {
-                return this.Select(c => c.RunSum).Sum();
+                return this.Select(c => c.PrimeSum).Sum();
             }
         }
 
@@ -75,7 +75,55 @@ namespace DataModels
             }
         }
 
+        public static Sentence operator -(Sentence o1, int[] o2)
+        {
+            Sentence result = new Sentence();
+            result.AddRange(o1.Words);
+            int index = 0;
+            foreach (Word w in result)
+            {
+                if (index >= o2.Length)
+                {
+                    break;
+                }
+                foreach (Character c in w)
+                {
+                    if (index >= o2.Length)
+                    {
+                        break;
+                    }
+                    var newResult = c.GematriaIndex - o2[index];
+                    c.Rune = Alphabets.INDEXED_RUNES[newResult < 0 ? 29 + newResult : newResult];
+                    index++;
+                }
+            }
+            return result;
+        }
 
+        public static Sentence operator +(Sentence o1, int[] o2)
+        {
+            Sentence result = new Sentence();
+            result.AddRange(o1.Words);
+            int index = 0;
+            foreach (Word w in result)
+            {
+                if (index >= o2.Length)
+                {
+                    break;
+                }
+                foreach (Character c in w)
+                {
+                    if (index >= o2.Length)
+                    {
+                        break;
+                    }
+                    var newResult = c.GematriaIndex + o2[index] % 29;
+                    c.Rune = Alphabets.INDEXED_RUNES[newResult];
+                    index++;
+                }
+            }
+            return result;
+        }
 
         private List<Character> _characters;
         public List<Character> Characters
@@ -100,6 +148,11 @@ namespace DataModels
         public override string ToString()
         {
             return Latin;
+        }
+
+        public string ToPrimeSumString()
+        {
+            return String.Join(" ", this.Where(w => w.Any(c => c.Type == CharacterType.Rune)).Select(w => w.PrimeSum)) + " = " + PrimeSum + ".";
         }
 
         public override int GetHashCode()

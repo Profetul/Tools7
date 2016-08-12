@@ -116,6 +116,11 @@ namespace Cryptanalysis
             return characters.ToFrequency(interval).ToIoC();
         }
 
+        public static double[] ToIoCNew(this List<Character> characters, int interval = 1)
+        {
+            return characters.ToFrequency(interval).ToIoCNew();
+        }
+
         public static double[] ToIoC(this Dictionary<Character, int>[] characterFrequencies)
         {
 
@@ -126,6 +131,22 @@ namespace Cryptanalysis
                 double phiN = (1.0 / 29.0) * n * (n - 1);
                 double phiR = characterFrequencies[i].Values.Select(v => (double)(v * (v - 1))).Sum();
                 results[i] = phiR / phiN;
+            }
+            return results;
+        }
+
+        public static double[] ToIoCNew(this Dictionary<Character, int>[] characterFrequencies)
+        {
+
+            double[] results = new double[characterFrequencies.Length];
+            for (int i = 0; i < results.Length; i++)
+            {
+                double sum = (double)characterFrequencies[i].Select(c => c.Value).Sum();
+                results[i] = characterFrequencies[i].Aggregate((double)0.0, (a, c) =>
+                {
+                    a += ((double)c.Value * (double)(c.Value - 1)) / ((double)sum * (double)(sum - 1));
+                    return a;
+                });
             }
             return results;
         }

@@ -50,7 +50,7 @@ namespace DataModels
         {
             get
             {
-                return this.Sections.Select(c => c.RuneSum).Sum();
+                return this.Sections.Select(c => c.PrimeSum).Sum();
             }
         }
 

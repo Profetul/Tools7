@@ -43,7 +43,8 @@ namespace OEIS
                 }
             }
 
-            return _cachedValue.IndexOf(stringPattern) / 2;
+            var resultIndex = _cachedValue.IndexOf(stringPattern);
+            return resultIndex;
         }
 
         private static IEnumerable<int> PatternAt(byte[] source, byte[] pattern)

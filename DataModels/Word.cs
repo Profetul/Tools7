@@ -35,7 +35,7 @@ namespace DataModels
             }
         }
 
-        public long RunSum
+        public long PrimeSum
         {
             get
             {
@@ -89,7 +89,7 @@ namespace DataModels
             return result.AsWord();
         }
 
-        public static int[] operator |(Word o1, Word o2)
+        public static int[] operator -(Word o1, Word o2)
         {
             if (o1 == null)
             {
@@ -120,6 +120,36 @@ namespace DataModels
             return result;
         }
 
+        public static int[] operator +(Word o1, Word o2)
+        {
+            if (o1 == null)
+            {
+                return o2.Select(o => o.GematriaIndex).ToArray();
+            }
+
+            if (o2 == null)
+            {
+                return o1.Select(o => o.GematriaIndex).ToArray();
+            }
+
+            var maxCount = Math.Max(o1.Count, o2.Count);
+            var minCount = Math.Min(o1.Count, o2.Count);
+
+            int[] result = new int[o1.Count];
+
+            for (int i = 0; i < o1.Count; i++)
+            {
+                if (i >= o2.Count)
+                {
+                    result[i] = o1[i].GematriaIndex;
+                }
+                else
+                {
+                    result[i] = o1[i].GematriaIndex + o2[i].GematriaIndex;
+                }
+            }
+            return result;
+        }
 
         public override bool Equals(object obj)
         {

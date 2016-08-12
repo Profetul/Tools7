@@ -57,17 +57,17 @@ namespace Solver
 
         private static void Processor()
         {
-            int paragraphIndex = 18;//book.Paragraphs.IndexOf(book.Sections[7][0]);
+            int paragraphIndex = 27;//book.Paragraphs.IndexOf(book.Sections[7][0]);
             int maxIndex = book.Paragraphs.IndexOf(book.Sections[book.Sections.Count - 3][0]) - 1;
             int wordIndex = 0;
-            int cribIndex = 1247;
-            int sizeLimit = 13000;
+            int cribIndex = 451;
+            int sizeLimit = 3500;
 
             while (paragraphIndex < maxIndex)
             {
                 var paragraph = book.Paragraphs[paragraphIndex];
                 var stringCharacters = String.Join("", paragraph.Characters);
-                var wordLength = paragraph.Words.Where(w => w.Count > 6 && w.Count < 11).Max(w => w.Count);
+                var wordLength = paragraph.Words.Any(w => w.Count > 11) ? paragraph.Words.Select(w => w.Count).Max() : 0;
                 var runeWords = paragraph.Words.Where(w => w.Count == wordLength).ToList();
                 var cribWords = dictionary.Where(w => w.Key.Count == wordLength).Select(w => w.Key).ToList();
                 while (wordIndex < runeWords.Count)
@@ -80,26 +80,12 @@ namespace Solver
                     {
                         var cribWord = cribWords[cribIndex];
                         var cribWordString = cribWord.ToString();
-                        var x1 = (runeWord | cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
+                        var x1 = (runeWord - cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
                         var strX1 = "-" + String.Join("-", x1) + "-";
-                        /*
-                        var x2 = (runeWord | !cribWord).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX2 = "-" + String.Join("-", x2) + "-";
-
-
-                        var x3 = (runeWord | cribWord.Reverced).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX3 = "-" + String.Join("-", x3) + "-";
-
-                        var x4 = (runeWord | !(cribWord.Reverced)).Select(b => (sbyte)b < 0 ? (byte)((29 + (sbyte)b) % 29) : (byte)b).ToArray();
-                        var strX4 = "-" + String.Join("-", x4) + "-";
-                        */
                         Parallel.ForEach(sequences,
                         sequence =>
                         {
-                            CheckSequence(sequence, strX1, sizeLimit, characterIndex, paragraphIndex, runeWordString, cribWordString, "runeWord_cribWord");
-                            //CheckSequence(sequence, strX2, sizeLimit, characterIndex, paragraphIndex, runeWordString, cribWordString, "runeWord_not_cribWord");
-                            //CheckSequence(sequence, strX1, sizeLimit, characterIndex, paragraphIndex, runeWordString, cribWordString, "runeWord_rev_cribWord");
-                            //CheckSequence(sequence, strX2, sizeLimit, characterIndex, paragraphIndex, runeWordString, cribWordString, "runeWord_not_rev_cribWord");
+                            CheckSequence(sequence, strX1, sizeLimit, paragraphIndex, runeWordString, cribWordString, "runeWord_cribWord");
                         });
 
                         cribIndex++;
@@ -113,7 +99,7 @@ namespace Solver
 
         }
 
-        private static void CheckSequence(OeisRow sequence, string stringPattern, int sizeLimit, int characterIndex, int refIndex, string runeWord, string cribWord, string patternName)
+        private static void CheckSequence(OeisRow sequence, string stringPattern, int sizeLimit, int refIndex, string runeWord, string cribWord, string patternName)
         {
             int resultIndex = sequence.FindPattern(stringPattern, sizeLimit);
             if (resultIndex > 0)
@@ -125,10 +111,9 @@ namespace Solver
                         RefIndex = refIndex,
                         PatterName = patternName,
                         OeisId = sequence.OeisId,
-                        InSectionIndex = characterIndex,
-                        InStreamIndex = resultIndex,
                         RuneWord = runeWord.ToString(),
-                        CribWord = cribWord.ToString()
+                        CribWord = cribWord.ToString(),
+                        Pattern = stringPattern
                     });
                 }
             }

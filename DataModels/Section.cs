@@ -34,11 +34,11 @@ namespace DataModels
             }
         }
 
-        public long RuneSum
+        public long PrimeSum
         {
             get
             {
-                return this.Select(c => c.RuneSum).Sum();
+                return this.Select(c => c.PrimeSum).Sum();
             }
         }
 
@@ -101,6 +101,10 @@ namespace DataModels
             return Latin;
         }
 
+        public string ToPrimeSumString()
+        {
+            return String.Join("\r\n", this.Select(w => w.ToPrimeSumString())) + "\r\nSection Total: " + PrimeSum + "\r\n";
+        }
     }
 
 }
