@@ -20,7 +20,7 @@ namespace Analyzer
         {
             book.LoadFromFile(@"..\DataSources\liber-master");
             WordDictionary dictionary = new WordDictionary();
-            ictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
+            dictionary.LoadFromFile(@"..\DataSources\CicadaSentences.txt");
             dictionary.LoadFromFile(@"..\DataSources\Titles.txt");
             dictionary.LoadFromFile(@"..\DataSources\MasterMind.txt");
             for (int secIndex = 7; secIndex < book.Sections.Count - 2; secIndex++)
