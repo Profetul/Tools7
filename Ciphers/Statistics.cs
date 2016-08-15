@@ -197,26 +197,66 @@ namespace Cryptanalysis
                 return new Dictionary<Word, List<int>>();
             }
 
+            object locker = new object();
             Dictionary<Word, List<int>> counter = new Dictionary<Word, List<int>>();
-            for (int i = 0; i < characters.Count; i++)
+            Parallel.For(0, characters.Count, i =>
+
+            //for (int i = 0; i < characters.Count; i++)
             {
                 if (i + nGrams > characters.Count)
                 {
-                    break;
+                    return;
                 }
+
                 Word key = characters.Skip(i).Take(nGrams).AsWord();
-                if (!counter.ContainsKey(key))
+                lock (locker)
                 {
-                    counter.Add(key, new List<int>() { i });
-                }
-                else
-                {
+                    if (!counter.ContainsKey(key))
+                    {
+                        counter.Add(key, new List<int>());
+                    }
                     counter[key].Add(i);
                 }
 
             }
+            );
             return counter.Where(n => n.Value.Count > 0).OrderByDescending(n => n.Value.Count).ToDictionary(k => k.Key, v => v.Value);
         }
+
+
+        public static Dictionary<Word, int> NGramCount(this List<Character> characters, int nGrams = 2)
+        {
+            if (nGrams < 2)
+            {
+                return new Dictionary<Word, int>();
+            }
+
+            object sync = new object();
+            Dictionary<Word, int> counter = new Dictionary<Word, int>();
+            Parallel.For(0, characters.Count, i =>
+            {
+                if (i + nGrams > characters.Count)
+                {
+                    return;
+                }
+
+                Word key = characters.Skip(i).Take(nGrams).AsWord();
+                lock (sync)
+                {
+                    if (!counter.ContainsKey(key))
+                    {
+                        counter.Add(key, 1);
+                    }
+                    else
+                    {
+                        counter[key] = counter[key] + 1;
+                    }
+                }
+            });
+
+            return counter.OrderByDescending(n => n.Value).ToDictionary(k => k.Key, v => v.Value);
+        }
+
         public static Dictionary<Word, List<int>> NGramPairs(this List<Character> characters, int nGrams = 2)
         {
             if (nGrams < 2)

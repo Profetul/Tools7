@@ -13,13 +13,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solver", "Solver\Solver.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataSources", "DataSources", "{FB53E7E1-E841-4244-B52E-A422981DABB9}"
 	ProjectSection(SolutionItems) = preProject
+		DataSources\atlas.txt = DataSources\atlas.txt
+		DataSources\Bible.txt = DataSources\Bible.txt
 		DataSources\CicadaSentences.txt = DataSources\CicadaSentences.txt
 		DataSources\CicadaSpeak.txt = DataSources\CicadaSpeak.txt
+		DataSources\english_quadgrams.txt = DataSources\english_quadgrams.txt
 		DataSources\Koans.txt = DataSources\Koans.txt
 		DataSources\liber-master = DataSources\liber-master
 		DataSources\liber-shortend = DataSources\liber-shortend
+		DataSources\LordOfRings.txt = DataSources\LordOfRings.txt
 		DataSources\MasterMind.txt = DataSources\MasterMind.txt
 		DataSources\Primes.txt = DataSources\Primes.txt
+		DataSources\SelfRel.txt = DataSources\SelfRel.txt
+		DataSources\SongsOfCicada.txt = DataSources\SongsOfCicada.txt
 		DataSources\Titles.txt = DataSources\Titles.txt
 		DataSources\WordList.txt = DataSources\WordList.txt
 	EndProjectSection

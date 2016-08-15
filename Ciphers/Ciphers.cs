@@ -93,6 +93,68 @@ namespace Cryptanalysis
             }
             return output;
         }
+
+        public static List<Character> EncodeVigenere(List<Character> key, List<Character> input)
+        {
+            List<Character> output = new List<Character>(input.Count);
+            output.AddRange(input);
+            Parallel.For(0, input.Count, (index) =>
+            {
+                var newIndex = (key[index % key.Count].GematriaIndex + input[index].GematriaIndex) % 29;
+                output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex] };
+            });
+            return output;
+        }
+
+        public static List<Character> DecodeVigenere(List<Character> key, List<Character> input)
+        {
+            List<Character> output = new List<Character>();
+            output.AddRange(input);
+            Parallel.For(0, input.Count, (index) =>
+            {
+                var newIndex = (input[index].GematriaIndex - key[index % key.Count].GematriaIndex) % 29;
+                output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex < 0 ? 29 + newIndex : newIndex] };
+            });
+            return output;
+        }
+
+        public static List<Character> EncodeAutokey(List<Character> key, List<Character> input)
+        {
+            List<Character> output = new List<Character>(input.Count);
+            output.AddRange(input);
+
+            List<Character> autokey = new List<Character>(key.Count + input.Count);
+            autokey.AddRange(key);
+            autokey.AddRange(input);
+            return EncodeVigenere(autokey, input);
+        }
+
+        public static List<Character> DecodeAutokey(List<Character> key, List<Character> input)
+        {
+            var newKey = key;
+            int offset = 0;
+            List<Character> output = new List<Character>(input.Count);
+            while (offset < input.Count)
+            {
+                newKey = DecodeVigenere(newKey, input.Skip(offset).Take(key.Count).ToList());
+                output.AddRange(newKey);
+                offset += newKey.Count;
+            }
+            return output;
+        }
+        public static List<Character> DecodeAntiAutokey(List<Character> key, List<Character> input)
+        {
+            var newKey = key;
+            int offset = 0;
+            List<Character> output = new List<Character>(input.Count);
+            while (offset < input.Count)
+            {
+                newKey = EncodeVigenere(newKey, input.Skip(offset).Take(key.Count).ToList());
+                output.AddRange(newKey);
+                offset += newKey.Count;
+            }
+            return output;
+        }
     }
 }
 

@@ -24,6 +24,10 @@ namespace OEIS
 
         private int _cachedLength;
 
+        public void ComputeMod29()
+        {
+            Mod29 = Mod29.Select(m => (sbyte)m < 0 ? (byte)((29 + (sbyte)m) % 29) : m).ToArray();
+        }
 
         public int FindPattern(string stringPattern, int sizeLimit = 150)
         {

@@ -8,6 +8,7 @@ namespace DataModels
 {
     public class Character
     {
+
         public CharacterType Type { get; set; }
 
         public char Rune { get; set; }
@@ -34,6 +35,11 @@ namespace DataModels
             {
                 return Type == CharacterType.Rune ? Alphabets.RUNE_PRIME[Rune] : 0;
             }
+        }
+
+        public Character()
+        {
+            Type = CharacterType.Rune;
         }
 
         public static bool operator ==(Character o1, Character o2)
