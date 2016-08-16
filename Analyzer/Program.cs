@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Analyzer
 {
@@ -20,6 +21,65 @@ namespace Analyzer
         private static double nGramsTotal = 0.0;
         private static double nGramsFloor = 0.0;
         static void Main(string[] args)
+        {
+            HashSet<Sentence> sentences = new HashSet<Sentence>();
+            File.ReadAllLines(@"..\Results\18.txt").Select(line =>
+            {
+                string[] words = line.Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                if(words.Length > 1 && words[0].Length == 1)
+                {
+                    Sentence s = new Sentence
+                    {
+                        words[0].ToWord(),
+                        words[1].ToWord()
+                    };
+                    if (!sentences.Any(sa => sa[1].Equals(s[1])))
+                    {
+                        sentences.Add(s);
+                    }
+                }
+                return 0;
+            }).ToList();
+
+            File.AppendAllText(@"..\Results\1_8.txt", String.Join("\r\n", sentences.Select(s => s[0].ToString() + " " + s[1].ToString())));
+
+            List<Word> nGrams = new List<Word>();
+            File.ReadAllLines(@"..\DataSources\Koans.txt").Select(line =>
+            {
+                string[] words = line.Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var word in words)
+                {
+                    nGrams.Add(word.ToWord());
+                }
+                return 0;
+            }).ToList();
+
+            BlockingCollection<Sentence> results = new BlockingCollection<Sentence>();
+            Parallel.For(0, nGrams.Count - 1, index =>
+            {
+                if (nGrams[index].Count == 1)
+                {
+                    results.Add(new Sentence
+                    {
+                        nGrams[index],
+                        nGrams[index + 1]
+                    });
+                }
+            });
+
+            HashSet<Sentence> oneToMany = results.Where(s => s[1].Count == 8).Aggregate(new HashSet<Sentence>(), (a, n) =>
+            {
+                if (!a.Contains(n))
+                {
+                    a.Add(n);
+                }
+                return a;
+            });
+
+            File.AppendAllText(@"..\Results\18.txt", String.Join("\r\n", oneToMany.Select(s => s[0].ToString() + " " + s[1].ToString())));
+        }
+
+        private static void AutokeyBreaker()
         {
             var section = "A-P-IA-M-T-E-A-H-P-G-OE-AE-P-U-U-B-E-Y-E-S-M-Y-EO-W-H-H-S-EA-M-ING-W-I-J-R-C-B-Y-M-T-ING-J-T-G-TH-L-P-D-H-L-ING-G-R-ING-EO-E-I-ING-U-S-A-TH-O-J-U-D-X-IA-R-O-OE-G-Y-R-S-E-EA-G-AE-D-B-L-C-S-M-D-W-H-E-J-U-U-J-IA-OE-OE-Y-EA-H-A-IA-EO-E-W-A-O-M-TH-EA-EO-EO-EO-C-IA-A-I-O-EA-X-O-X-L-G-T-J-G-EO-EO-OE-P-X-O-C-T-I-AE-F-M-E-TH-X-TH-M-C-T-E-D-J-A-P-S-ING-N-AE-N-N-EO-R-W-EO-I-TH-W-F-X-S-EA-TH-D-X-T-AE-W-C-W-IA-C-EO-M-I-L-W-P-G-Y-D-C-OE-M-X-S-IA-I-D-E-E-J-I-A-P-O-N-H-EA-W-I-P-M-U-X-T-O-M-Y-G-H-X-E-B-A-M-IA-I-S-U-M-ING-AE-F-EA-B-I-IA-TH-J-ING-X-S-EA-E-C-X-F-O-J-EA-X-B-U-P-G-TH-B-IA-ING-G-Y-C-ING-L-M-R-OE-Y-B-D-Y-L-OE-D-D-OE-M-R-M-C-C-F-X-OE-E-D-TH-O-U-EA-F-G-O-Y-D-A-H-C-B-M-TH-ING-R-B-E-G-S-U-P-B-G-C-I".ToWord();
 

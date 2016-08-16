@@ -162,7 +162,7 @@ namespace DataModels
 
         public override int GetHashCode()
         {
-            return String.Join(" ", Words.ToString()).GetHashCode();
+            return Runes.GetHashCode();
         }
     }
 
