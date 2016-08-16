@@ -23,7 +23,7 @@ namespace Analyzer
         static void Main(string[] args)
         {
 
-            List<Sentence> sentences = File.ReadAllLines(@"..\DataSources\GEB.txt").Select(line =>
+            List<Sentence> sentences = File.ReadAllLines(@"..\DataSources\Bible.txt").Select(line =>
             {
                 Sentence sentence = new Sentence();
                 string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
@@ -46,9 +46,9 @@ namespace Analyzer
                 for (int index = 0; index < sentence.Count - 2; index++)
                 {
                     //var index = 0;
-                    if (sentence[index].Count == 5
-                        && sentence[index + 1].Count == 7
-                        //&& sentence[index + 2].Count == 4
+                    if (sentence[index].Count == 1
+                        && sentence[index + 1].Count == 8
+                        //&& sentence[index + 2].Count == 3
                         //&& sentence[index + 3].Count == 2
                         )
                     {
@@ -56,13 +56,13 @@ namespace Analyzer
                         {
                             sentence[index],
                             sentence[index + 1],
-                          //  sentence[index + 2],
+                            //sentence[index + 2],
                           //  sentence[index + 3]
                         }, 1, (k, v) => v + 1);
                     }
                 }
             });
-            File.WriteAllText(@"..\Results\GEB_5_7.txt", String.Join("\r\n", nSentence.OrderByDescending(l => l.Value).Select(l => l.Key.ToString())));
+            File.WriteAllText(@"..\Results\BB_1_8.txt", String.Join("\r\n", nSentence.OrderByDescending(l => l.Value).Select(l => l.Key.ToString())));
 
         }
 
