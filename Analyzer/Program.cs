@@ -45,51 +45,55 @@ namespace Analyzer
             //nGramExtractor(nGrams);
 
             nGramsTotal = (double)stats.Select(s => s.Counts).Sum();
-            nGramsFloor = Math.Log10((double)0.01 / nGramsTotal);
+            nGramsFloor = Math.Log10((double)0.0001 / nGramsTotal);
             Parallel.ForEach(stats, s => s.Log10 = Math.Log10((double)s.Counts / nGramsTotal));
 
             //File.WriteAllText(@"c:\temp\quards2.txt", String.Join("\r\n", stats.Select(k => k.Word.ToString() + "," + k.Counts)));
             double[] results = new double[29];
-            int keySize = 9;
-            int[] keyShift = new int[keySize];
-            double prevMax = double.MinValue;
-            while (true)
+            for (int keySize = 2; keySize < 30; keySize++)
             {
-                double maxValue = double.MinValue;
-                for (int inKey = 0; inKey < keySize; inKey++)
+                int[] keyShift = new int[keySize];
+                double prevMax = double.MinValue;
+                while (true)
                 {
-                    Parallel.For(0, 29, (index) =>
+                    double maxValue = double.MinValue;
+                    for (int inKey = 0; inKey < keySize; inKey++)
                     {
-                        keyShift[inKey] = index;
-                        List<int> key = keyShift.ToList();
-                        key.Insert(0, 0);
-                        var decoded = Ciphers.DecodeAutokey(key.ToArray().AsWord(), section);
-                        results[index] = decoded.NGramCount(4).Select(k =>
+                        Parallel.For(0, 29, (index) =>
                         {
-                            var stat = stats.FirstOrDefault(n => n.Word.Equals(k.Key));
-                            if (stat == null)
+                            keyShift[inKey] = index;
+                            List<int> key = keyShift.ToList();
+                            key.Insert(0, 0);
+                            var decoded = Ciphers.DecodeAutokey(key.ToArray().AsWord(), section);
+                            results[index] = decoded.NGramCount(4).Select(k =>
                             {
-                                return nGramsFloor * k.Value;
-                            }
-                            return stat.Log10 * k.Value;
-                        }).Sum();
+                                var stat = stats.FirstOrDefault(n => n.Word.Equals(k.Key));
+                                if (stat == null)
+                                {
+                                    return nGramsFloor * k.Value;
+                                }
+                                return stat.Log10 * k.Value;
+                            }).Sum();
+                        }
+                        );
+
+                        maxValue = results.Max();
+                        var newIndex = results.ToList().IndexOf(maxValue);
+                        keyShift[inKey] = newIndex;
                     }
-                    );
 
-                    maxValue = results.Max();
-                    var newIndex = results.ToList().IndexOf(maxValue);
-                    keyShift[inKey] = newIndex;
+                    List<int> testKey = keyShift.ToList();
+                    testKey.Insert(0, 0);
+                    var rez = Ciphers.DecodeAutokey(testKey.ToArray().AsWord(), section).Take(30).AsWord().ToString();
+                    Console.WriteLine("{0} => {1}", String.Join(",", testKey), rez);
+                    File.AppendAllText(@"..\Results\AutoKey.txt", String.Format("\r\n{0} => {1}", String.Join(",", testKey), rez));
+                    if (prevMax >= maxValue)
+                    {
+                        break;
+                    }
+                    prevMax = maxValue;
                 }
-                if (prevMax >= maxValue)
-                {
-                    break;
-                }
-                prevMax = maxValue;
             }
-
-            List<int> testKey = keyShift.ToList();
-            testKey.Insert(0, 0);
-            var rez = Ciphers.DecodeAutokey(testKey.ToArray().AsWord(), section).AsWord().ToString();
         }
 
         private static double Fitness(List<Character> text)
