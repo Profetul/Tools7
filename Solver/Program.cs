@@ -33,11 +33,9 @@ namespace Solver
         {
             book.LoadFromFile(@"..\DataSources\liber-master");
 
-            List<Character> chars = book.Sections[15].Characters;
-            var crib = "A reminder".ToWord();
-            var result = chars.Take(9).ToList().AsWord() - crib;
+            List<Character> chars = book.Sections[7].Characters;
             List<Character> newCharacters = new List<Character>();
-            var nCount = 77;
+            var nCount = 3;
             for (int col = 0; col < nCount; col++)
             {
                 for (int row = 0; row < chars.Count / nCount; row++)
@@ -46,6 +44,10 @@ namespace Solver
                     newCharacters.Add(c);
                 }
             }
+            var orgBiGrams = chars.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
+            var biGrams = newCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
+            var triGrams = newCharacters.NGramCount(3).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex).Select(v => v.Value).Sum();
+            var quadGrams = newCharacters.NGramCount(4).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex && k.Key[0].GematriaIndex == k.Key[3].GematriaIndex).Select(v => v.Value).Sum();
         }
 
 
