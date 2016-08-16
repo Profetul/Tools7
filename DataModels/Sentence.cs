@@ -160,6 +160,15 @@ namespace DataModels
             return String.Join(" ", this.Where(w => w.Any(c => c.Type == CharacterType.Rune)).Select(c => c.ToPrimesString()));
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is Sentence)
+            {
+                return this.Runes.Equals((obj as Sentence)?.Runes);
+            }
+            return false;
+        }
+
         public override int GetHashCode()
         {
             return Runes.GetHashCode();

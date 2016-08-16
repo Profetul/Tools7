@@ -22,61 +22,48 @@ namespace Analyzer
         private static double nGramsFloor = 0.0;
         static void Main(string[] args)
         {
-            HashSet<Sentence> sentences = new HashSet<Sentence>();
-            File.ReadAllLines(@"..\Results\18.txt").Select(line =>
-            {
-                string[] words = line.Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
-                if(words.Length > 1 && words[0].Length == 1)
-                {
-                    Sentence s = new Sentence
-                    {
-                        words[0].ToWord(),
-                        words[1].ToWord()
-                    };
-                    if (!sentences.Any(sa => sa[1].Equals(s[1])))
-                    {
-                        sentences.Add(s);
-                    }
-                }
-                return 0;
-            }).ToList();
 
-            File.AppendAllText(@"..\Results\1_8.txt", String.Join("\r\n", sentences.Select(s => s[0].ToString() + " " + s[1].ToString())));
-
-            List<Word> nGrams = new List<Word>();
-            File.ReadAllLines(@"..\DataSources\Koans.txt").Select(line =>
+            List<Sentence> sentences = File.ReadAllLines(@"..\DataSources\GEB.txt").Select(line =>
             {
-                string[] words = line.Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                Sentence sentence = new Sentence();
+                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var word in words)
                 {
-                    nGrams.Add(word.ToWord());
+                    if (word.Length == 1 && !(word == "A" || word == "I"))
+                    {
+                        continue;
+                    }
+                    sentence.Add(word.ToWord());
                 }
-                return 0;
+                return sentence;
             }).ToList();
 
-            BlockingCollection<Sentence> results = new BlockingCollection<Sentence>();
-            Parallel.For(0, nGrams.Count - 1, index =>
+            ConcurrentDictionary<Sentence, int> nSentence = new ConcurrentDictionary<Sentence, int>();
+            Parallel.ForEach(sentences, sentence =>
             {
-                if (nGrams[index].Count == 1)
+                if (sentence.Count < 2)
+                    return;
+                for (int index = 0; index < sentence.Count - 2; index++)
                 {
-                    results.Add(new Sentence
+                    //var index = 0;
+                    if (sentence[index].Count == 5
+                        && sentence[index + 1].Count == 7
+                        //&& sentence[index + 2].Count == 4
+                        //&& sentence[index + 3].Count == 2
+                        )
                     {
-                        nGrams[index],
-                        nGrams[index + 1]
-                    });
+                        nSentence.AddOrUpdate(new Sentence
+                        {
+                            sentence[index],
+                            sentence[index + 1],
+                          //  sentence[index + 2],
+                          //  sentence[index + 3]
+                        }, 1, (k, v) => v + 1);
+                    }
                 }
             });
+            File.WriteAllText(@"..\Results\GEB_5_7.txt", String.Join("\r\n", nSentence.OrderByDescending(l => l.Value).Select(l => l.Key.ToString())));
 
-            HashSet<Sentence> oneToMany = results.Where(s => s[1].Count == 8).Aggregate(new HashSet<Sentence>(), (a, n) =>
-            {
-                if (!a.Contains(n))
-                {
-                    a.Add(n);
-                }
-                return a;
-            });
-
-            File.AppendAllText(@"..\Results\18.txt", String.Join("\r\n", oneToMany.Select(s => s[0].ToString() + " " + s[1].ToString())));
         }
 
         private static void AutokeyBreaker()

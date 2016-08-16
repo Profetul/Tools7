@@ -1,5 +1,6 @@
 ﻿using DataModels;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -232,7 +233,7 @@ namespace Cryptanalysis
             }
 
             object sync = new object();
-            Dictionary<Word, int> counter = new Dictionary<Word, int>();
+            ConcurrentDictionary<Word, int> counter = new ConcurrentDictionary<Word, int>();
             Parallel.For(0, characters.Count, i =>
             {
                 if (i + nGrams > characters.Count)
@@ -241,17 +242,7 @@ namespace Cryptanalysis
                 }
 
                 Word key = characters.Skip(i).Take(nGrams).AsWord();
-                lock (sync)
-                {
-                    if (!counter.ContainsKey(key))
-                    {
-                        counter.Add(key, 1);
-                    }
-                    else
-                    {
-                        counter[key] = counter[key] + 1;
-                    }
-                }
+                counter.AddOrUpdate(key, 1, (a, b) => b + 1);
             });
 
             return counter.OrderByDescending(n => n.Value).ToDictionary(k => k.Key, v => v.Value);
