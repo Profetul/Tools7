@@ -32,9 +32,20 @@ namespace Solver
         private static void Initialize()
         {
             book.LoadFromFile(@"..\DataSources\liber-master");
-            var result = String.Join(",", book.Sections[15][0][1].Characters);
-            dictionary.LoadFromFile(@"..\DataSources\GEB.txt");
-            var words = dictionary.Where(w => w.Key.Count == 13).ToList();
+
+            List<Character> chars = book.Sections[15].Characters;
+            var crib = "A reminder".ToWord();
+            var result = chars.Take(9).ToList().AsWord() - crib;
+            List<Character> newCharacters = new List<Character>();
+            var nCount = 77;
+            for (int col = 0; col < nCount; col++)
+            {
+                for (int row = 0; row < chars.Count / nCount; row++)
+                {
+                    var c = chars[row * nCount + col];
+                    newCharacters.Add(c);
+                }
+            }
         }
 
 
