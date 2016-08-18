@@ -32,10 +32,11 @@ namespace Solver
 
         private static void Initialize()
         {
-            book.LoadFromFile(@"..\DataSources\liber-master");
-            for (int sIndex = 7; sIndex < book.Sections.Count - 2; sIndex++)
+            book.LoadFromFile(@"..\DataSources\liber-work");
+            for (int sIndex = 0; sIndex < book.Sections.Count - 2; sIndex++)
             {
                 List<Character> sectionCharacters = book.Sections[sIndex].Characters;
+                string values = String.Join(" ",sectionCharacters.Select(s => s.GematriaIndex.ToString("00")));
                 for (int nCount = 2; nCount < sectionCharacters.Count; nCount++)
                 {
                     if (sectionCharacters.Count % nCount != 0)
