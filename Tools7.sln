@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataSources", "DataSources"
 		DataSources\Koans.txt = DataSources\Koans.txt
 		DataSources\liber-master = DataSources\liber-master
 		DataSources\liber-shortend = DataSources\liber-shortend
+		DataSources\liber-work = DataSources\liber-work
 		DataSources\LordOfRings.txt = DataSources\LordOfRings.txt
 		DataSources\MasterMind.txt = DataSources\MasterMind.txt
 		DataSources\Primes.txt = DataSources\Primes.txt

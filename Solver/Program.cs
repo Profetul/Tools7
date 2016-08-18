@@ -32,33 +32,31 @@ namespace Solver
 
         private static void Initialize()
         {
-            //File.WriteAllBytes(@"..\Results\base60.bin", Keys.Base60Data);
-            book.LoadFromFile(@"..\DataSources\liber-master");
-            var c1 = book.Sections[book.Sections.Count - 2];
-            for (int sIndex = 7; sIndex < book.Sections.Count - 2; sIndex++)
+            book.LoadFromFile(@"..\DataSources\liber-work");
+            for (int paragraphIndex = 0; paragraphIndex < book.Paragraphs.Count - 2; paragraphIndex++)
             {
-                List<Character> sectionCharacters = book.Sections[sIndex].Characters;
-                var C1 = book.Sections[sIndex].Words.Select(w => w[0]).ToList().AsWord().ToString(); ;
-                var C2 = book.Sections[sIndex].Words.Select(w => (!w)[0]).ToList().AsWord().ToString(); ;
-                //for (int nCount = 2; nCount < sectionCharacters.Count; nCount++)
-                //{
-                //    if (sectionCharacters.Count % nCount != 0)
-                //        continue;
+                List<Character> paragraphCharacters = book.Paragraphs[paragraphIndex].Characters;
+                var orgBiGrams = paragraphCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
+                string values = String.Join(" ",paragraphCharacters.Select(s => s.GematriaIndex.ToString("00")));
+                
+                for (int nCount = 2; nCount < paragraphCharacters.Count; nCount++)
+                {
+                    if (paragraphCharacters.Count % nCount != 0)
+                        continue;
 
-                //    List<Character> newCharacters = new List<Character>();
-                //    for (int col = 0; col < nCount; col++)
-                //    {
-                //        for (int row = 0; row < sectionCharacters.Count / nCount; row++)
-                //        {
-                //            var c = sectionCharacters[row * nCount + col];
-                //            newCharacters.Add(c);
-                //        }
-                //    }
-                //    var orgBiGrams = sectionCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
-                //    var biGrams = newCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
-                //    var triGrams = newCharacters.NGramCount(3).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex).Select(v => v.Value).Sum();
-                //    var quadGrams = newCharacters.NGramCount(4).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex && k.Key[0].GematriaIndex == k.Key[3].GematriaIndex).Select(v => v.Value).Sum();
-                //}
+                    List<Character> newCharacters = new List<Character>();
+                    for (int col = 0; col < nCount; col++)
+                    {
+                        for (int row = 0; row < paragraphCharacters.Count / nCount; row++)
+                        {
+                            var c = paragraphCharacters[row * nCount + col];
+                            newCharacters.Add(c);
+                        }
+                    }
+                    var biGrams = newCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
+                    var triGrams = newCharacters.NGramCount(3).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex).Select(v => v.Value).Sum();
+                    var quadGrams = newCharacters.NGramCount(4).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex && k.Key[0].GematriaIndex == k.Key[3].GematriaIndex).Select(v => v.Value).Sum();
+                }
             }
         }
 
