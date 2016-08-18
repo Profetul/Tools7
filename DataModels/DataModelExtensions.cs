@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,64 @@ namespace DataModels
 {
     public static class DataModelExtensions
     {
+
+        public static List<Sentence> SentencesFromFile(this string path)
+        {
+            return File.ReadAllLines(path).Select(line =>
+            {
+                Sentence sentence = new Sentence();
+                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var word in words)
+                {
+                    if (word.Length == 1 && !(word == "A" || word == "I"))
+                    {
+                        continue;
+                    }
+                    sentence.Add(word.ToWord());
+                }
+                return sentence;
+            }).ToList();
+        }
+
+        public static List<Word> WordsFromFile(this string path)
+        {
+            List<Word> output = new List<Word>();
+            File.ReadAllLines(path).Select(line =>
+            {
+                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var word in words)
+                {
+                    if (word.Length == 1 && !(word == "A" || word == "I"))
+                    {
+                        continue;
+                    }
+                    output.Add(word.ToWord());
+                }
+                return 0;
+            }).ToList();
+            return output;
+        }
+
+        public static List<Character> CharactersFromFile(this string path)
+        {
+            List<Character> output = new List<Character>();
+            File.ReadAllLines(path).Select(line =>
+            {
+                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var word in words)
+                {
+                    if (word.Length == 1 && !(word == "A" || word == "I"))
+                    {
+                        continue;
+                    }
+                    output.AddRange(word.ToWord());
+                }
+                return 0;
+            }).ToList();
+            return output;
+        }
+
+
         public static Word ToWord(this string word)
         {
             Word result = new Word();
