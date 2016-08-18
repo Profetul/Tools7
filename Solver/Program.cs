@@ -36,7 +36,9 @@ namespace Solver
             for (int paragraphIndex = 0; paragraphIndex < book.Paragraphs.Count - 2; paragraphIndex++)
             {
                 List<Character> paragraphCharacters = book.Paragraphs[paragraphIndex].Characters;
+                var orgBiGrams = paragraphCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
                 string values = String.Join(" ",paragraphCharacters.Select(s => s.GematriaIndex.ToString("00")));
+                
                 for (int nCount = 2; nCount < paragraphCharacters.Count; nCount++)
                 {
                     if (paragraphCharacters.Count % nCount != 0)
@@ -51,7 +53,6 @@ namespace Solver
                             newCharacters.Add(c);
                         }
                     }
-                    var orgBiGrams = paragraphCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
                     var biGrams = newCharacters.NGramCount(2).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(v => v.Value).Sum();
                     var triGrams = newCharacters.NGramCount(3).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex).Select(v => v.Value).Sum();
                     var quadGrams = newCharacters.NGramCount(4).Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex && k.Key[0].GematriaIndex == k.Key[2].GematriaIndex && k.Key[0].GematriaIndex == k.Key[3].GematriaIndex).Select(v => v.Value).Sum();

@@ -126,7 +126,10 @@ namespace DataModels
 
                         case '#':
                             if (currentWord.Count > 0)
+                            {
                                 currentSentance.Add(currentWord);
+                            }
+
                             currentWord = new Word();
                             character = new Character { Type = CharacterType.Delimiter, Rune = '#' };
                             currentWord.Add(character);
@@ -232,14 +235,14 @@ namespace DataModels
                         case '3':
                         case '4':
                         case '5':
-                            currentSection.Add(currentParagraph);
-                            currentParagraph = new Paragraph();
-                            currentWord = new Word();
-                            character = new Character { Type = CharacterType.Number, Rune = c };
-                            currentWord.Add(character);
-                            currentLine.Add(character);
-                            currentSentance.Add(currentWord);
-                            currentWord = new Word();
+                            //currentSection.Add(currentParagraph);
+                            //currentParagraph = new Paragraph();
+                            //currentWord = new Word();
+                            //character = new Character { Type = CharacterType.Number, Rune = c };
+                            //currentWord.Add(character);
+                            //currentLine.Add(character);
+                            //currentSentance.Add(currentWord);
+                            //currentWord = new Word();
                             break;
 
                         case '7':
