@@ -174,15 +174,26 @@ namespace DataModels
             return result;
         }
 
-        public static Word AsWord(this int[] key)
+        public static Word AsWord(this IEnumerable<int> input)
         {
             Word result = new Word();
-            for (int i = 0; i < key.Length; i++)
+            foreach (int val in input)
             {
-                result.Add(new Character { Type = CharacterType.Rune, Rune = Alphabets.INDEXED_RUNES[(29 + key[i]) % 29] });
+                result.Add(new Character(val));
             }
             return result;
         }
+
+        public static Word AsWord(this IEnumerable<byte> input)
+        {
+            Word result = new Word();
+            foreach (int val in input)
+            {
+                result.Add(new Character(val));
+            }
+            return result;
+        }
+
 
         public static bool IsOverlap(this Word word1, Word word2)
         {

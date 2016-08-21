@@ -126,13 +126,13 @@ namespace Cryptanalysis
         {
 
             double[] results = new double[characterFrequencies.Length];
-            for (int i = 0; i < results.Length; i++)
+            Parallel.For(0, results.Length, i =>
             {
                 double n = (double)characterFrequencies[i].Values.Sum();
                 double phiN = (1.0 / 29.0) * n * (n - 1);
                 double phiR = characterFrequencies[i].Values.Select(v => (double)(v * (v - 1))).Sum();
                 results[i] = phiR / phiN;
-            }
+            });
             return results;
         }
 
@@ -161,34 +161,24 @@ namespace Cryptanalysis
                 return new Dictionary<Character, int>[0];
             }
 
-            Dictionary<Character, int>[] characterFrequency = new Dictionary<Character, int>[interval];
+            ConcurrentDictionary<Character, int>[] characterFrequency = new ConcurrentDictionary<Character, int>[interval];
             for (int i = 0; i < interval; i++)
             {
-                characterFrequency[i] = new Dictionary<Character, int>();
+                characterFrequency[i] = new ConcurrentDictionary<Character, int>();
             }
 
-            for (int i = 0; i < characters.Count; i++)
+            Parallel.For(0, characters.Count, i =>
             {
                 var intervalIndex = (i + 1) % interval;
                 var character = characters[i];
                 if (character.Type != CharacterType.Rune)
                 {
-                    continue;
+                    return;
                 }
 
-                if (!characterFrequency[intervalIndex].ContainsKey(character))
-                {
-                    characterFrequency[intervalIndex].Add(character, 0);
-                }
-                characterFrequency[intervalIndex][character] = characterFrequency[intervalIndex][character] + 1;
-            }
-
-            for (int i = 0; i < interval; i++)
-            {
-                characterFrequency[i] = characterFrequency[i].OrderByDescending(c => c.Value).ToDictionary(c => c.Key, v => v.Value);
-            }
-
-            return characterFrequency;
+                characterFrequency[intervalIndex].AddOrUpdate(character, 1, (c, v) => v + 1);
+            });
+            return characterFrequency.Select(d => d.OrderByDescending(k => k.Value).ToDictionary(k => k.Key, k => k.Value)).ToArray();
         }
 
         public static Dictionary<Word, List<int>> NGramOffsets(this List<Character> characters, int nGrams = 2)
