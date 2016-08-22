@@ -42,6 +42,30 @@ namespace DataModels
             Type = CharacterType.Rune;
         }
 
+        public Character(int index) : this()
+        {
+            if (index < 0)
+            {
+                Rune = Alphabets.INDEXED_RUNES[29 + (index % 29)];
+            }
+            else
+            {
+                Rune = Alphabets.INDEXED_RUNES[index % 29];
+            }
+        }
+
+        public Character(byte index) : this()
+        {
+            if ((sbyte)index < 0)
+            {
+                Rune = Alphabets.INDEXED_RUNES[29 + (sbyte)((sbyte)index % 29)];
+            }
+            else
+            {
+                Rune = Alphabets.INDEXED_RUNES[index % 29];
+            }
+        }
+
         public static bool operator ==(Character o1, Character o2)
         {
             return o1?.Equals(o2) == true || (o1 == null && o2 == null);
