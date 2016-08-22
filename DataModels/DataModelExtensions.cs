@@ -179,7 +179,17 @@ namespace DataModels
             Word result = new Word();
             for (int i = 0; i < key.Length; i++)
             {
-                result.Add(new Character { Type = CharacterType.Rune, Rune = Alphabets.INDEXED_RUNES[(29 + key[i]) % 29] });
+                result.Add(new Character { Type = CharacterType.Rune, Rune = Alphabets.INDEXED_RUNES[key[i] < 0 ? (key[i] + 29) % 29 : (key[i]) % 29] });
+            }
+            return result;
+        }
+
+        public static Word AsWord(this byte[] key)
+        {
+            Word result = new Word();
+            for (int i = 0; i < key.Length; i++)
+            {
+                result.Add(new Character { Type = CharacterType.Rune, Rune = Alphabets.INDEXED_RUNES[(sbyte)key[i] < 0 ? ((sbyte)key[i] + 29) % 29 : (key[i]) % 29] });
             }
             return result;
         }
