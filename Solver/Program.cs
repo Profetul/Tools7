@@ -47,16 +47,14 @@ namespace Solver
                     var subCharacters = characters.Skip(offset).Take(charactersCount).AsWord();
                     Parallel.For(0, sequences.Length, seqIndex =>
                     {
-                        var key = sequences[seqIndex].Mod29.Take(charactersCount).AsWord();
-
-                        var result = Ciphers.EncodeVigenere(key, subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
+                        var result = Ciphers.EncodeVigenereSerial(sequences[seqIndex].CacheValueOfSize(charactersCount), subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
                         if (result <= doublesCount)
                         {
                             lock (syncRoot)
                             {
                                 string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:+\r\nText:{2}\r\nDoubles:{3}\r\n",
                                     sequences[seqIndex].OeisId,
-                                    String.Join("-", key),
+                                    String.Join("-", sequences[seqIndex].CacheValueOfSize(charactersCount)),
                                     String.Join("", subCharacters.Runes),
                                     result);
                                 File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);

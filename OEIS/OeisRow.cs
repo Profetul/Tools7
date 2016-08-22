@@ -18,11 +18,12 @@ namespace OEIS
 
         private object _syncRoot = new object();
 
-        //private byte[] _cachedMod29;
+        private byte[] _cachedMod29;
 
         private string _cachedValue;
 
         private int _cachedLength;
+
 
         public void ComputeMod29()
         {
@@ -30,6 +31,14 @@ namespace OEIS
         }
 
         public int FindPattern(string stringPattern, int sizeLimit = 150)
+        {
+            CacheValueOfSize(sizeLimit, true);
+            var resultIndex = _cachedValue.IndexOf(stringPattern);
+            return resultIndex;
+        }
+
+
+        public byte[] CacheValueOfSize(int sizeLimit, bool andString = false)
         {
             lock (_syncRoot)
             {
@@ -41,14 +50,16 @@ namespace OEIS
                 if (!_initialized)
                 {
                     _cachedLength = sizeLimit;
-                    byte[] _cachedMod29 = Mod29.Take(sizeLimit).Select(val => (sbyte)val < 0 ? (byte)((29 + (sbyte)val) % 29) : val).ToArray();
-                    _cachedValue = "-" + String.Join("-", _cachedMod29) + "-";
+                    _cachedMod29 = Mod29.Take(sizeLimit).Select(val => (sbyte)val < 0 ? (byte)((29 + (sbyte)val) % 29) : val).ToArray();
+                    if (andString)
+                    {
+                        _cachedValue = "-" + String.Join("-", _cachedMod29) + "-";
+                        _cachedMod29 = null;
+                    }
                     _initialized = true;
                 }
             }
-
-            var resultIndex = _cachedValue.IndexOf(stringPattern);
-            return resultIndex;
+            return _cachedMod29;
         }
 
         private static IEnumerable<int> PatternAt(byte[] source, byte[] pattern)

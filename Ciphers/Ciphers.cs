@@ -106,6 +106,30 @@ namespace Cryptanalysis
             return output;
         }
 
+        public static List<Character> EncodeVigenere(byte[] key, List<Character> input)
+        {
+            List<Character> output = new List<Character>(input.Count);
+            output.AddRange(input);
+            Parallel.For(0, input.Count, (index) =>
+            {
+                var newIndex = (key[index % key.Length] + input[index].GematriaIndex) % 29;
+                output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex] };
+            });
+            return output;
+        }
+
+        public static List<Character> EncodeVigenereSerial(byte[] key, List<Character> input)
+        {
+            List<Character> output = new List<Character>(input.Count);
+            output.AddRange(input);
+            for (int index = 0; index < input.Count; index++)
+            {
+                var newIndex = (key[index % key.Length] + input[index].GematriaIndex) % 29;
+                output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex] };
+            }
+            return output;
+        }
+
         public static List<Character> DecodeVigenere(List<Character> key, List<Character> input)
         {
             List<Character> output = new List<Character>();
@@ -113,6 +137,18 @@ namespace Cryptanalysis
             Parallel.For(0, input.Count, (index) =>
             {
                 var newIndex = (input[index].GematriaIndex - key[index % key.Count].GematriaIndex) % 29;
+                output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex < 0 ? 29 + newIndex : newIndex] };
+            });
+            return output;
+        }
+
+        public static List<Character> DecodeVigenere(byte[] key, List<Character> input)
+        {
+            List<Character> output = new List<Character>();
+            output.AddRange(input);
+            Parallel.For(0, input.Count, (index) =>
+            {
+                var newIndex = (input[index].GematriaIndex - key[index % key.Length]) % 29;
                 output[index] = new Character { Rune = Alphabets.INDEXED_RUNES[newIndex < 0 ? 29 + newIndex : newIndex] };
             });
             return output;
