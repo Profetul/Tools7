@@ -60,7 +60,6 @@ namespace Solver
                 int doublesCount = book.Sections[sectionIndex].Characters.DoublesCount();
                 int offset = 0;
                 while (offset < source.Count - charactersCount)
-
                 {
                     var sampleCharacters = source.Skip(offset).Take(charactersCount).ToList();
                     Parallel.For(0, sequences.Length, sequenceIndex =>
@@ -72,17 +71,21 @@ namespace Solver
                         var testIoc = sampleResult.ToIoC()[0];
                         if (sampleDoublesCount <= doublesCount && testIoc < 1.1)
                         {
-                            var iocs = sampleResult.ToIoCTable().Select(r => "(" + r.Key + "=" + r.Value + ")").ToList();
-                            results.Add(new TestResult
+                            var iocsTable = sampleResult.ToIoCTable();
+                            if (!iocsTable.Any(v => v.Value > 1.2))
                             {
-                                OeisId = sequence.OeisId,
-                                KeySize = key.Length,
-                                Key = String.Join(",", key),
-                                TextSize = charactersCount,
-                                Text = sampleCharacters.AsWord().Runes,
-                                DoublesCount = sampleDoublesCount,
-                                IoCs = String.Join(",", iocs)
-                            });
+                                var iocs = iocsTable.Select(r => "(" + r.Key + "=" + r.Value + ")").ToList();
+                                results.Add(new TestResult
+                                {
+                                    OeisId = sequence.OeisId,
+                                    KeySize = key.Length,
+                                    Key = String.Join(",", key),
+                                    TextSize = charactersCount,
+                                    Text = sampleCharacters.AsWord().Runes,
+                                    DoublesCount = sampleDoublesCount,
+                                    IoCs = String.Join(",", iocs)
+                                });
+                            }
                         }
                     });
                     offset += charactersCount;
