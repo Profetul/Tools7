@@ -72,5 +72,35 @@ namespace OEIS
                 }
             }
         }
+
+        public int FirstIndexOf(byte[] pattern, bool skipZero = false, int maxOffset = -1)
+        {
+            var max = maxOffset > 0 ? Math.Min(maxOffset, Mod29.Length - pattern.Length) : Mod29.Length - pattern.Length;
+            for (int index = 0; index < max; index++)
+            {
+                bool found = true;
+                int indexInPattern = 0;
+                int offset = 0;
+                while (indexInPattern < pattern.Length)
+                {
+                    found = found && Mod29[index + offset] == pattern[indexInPattern];
+                    if (!found && pattern[indexInPattern] != 0 && skipZero)
+                    {
+                        break;
+                    }
+                    found = true;
+                    if (pattern[indexInPattern] != 0 || !skipZero)
+                    {
+                        offset++;
+                    }
+                    indexInPattern++;
+                }
+                if (found)
+                {
+                    return index;
+                }
+            }
+            return -1;
+        }
     }
 }

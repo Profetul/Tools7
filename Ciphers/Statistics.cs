@@ -117,6 +117,16 @@ namespace Cryptanalysis
             return characters.ToFrequency(interval).ToIoC();
         }
 
+        public static Dictionary<int, double> ToIoCTable(this List<Character> characters, int maxValue = 50)
+        {
+            Dictionary<int, double> output = new Dictionary<int, double>();
+            for (int i = 1; i <= maxValue; i++)
+            {
+                output.Add(i, characters.ToIoC(i).Average());
+            }
+            return output;
+        }
+
         public static double[] ToIoCNew(this List<Character> characters, int interval = 1)
         {
             return characters.ToFrequency(interval).ToIoCNew();
@@ -236,6 +246,20 @@ namespace Cryptanalysis
             });
 
             return counter.OrderByDescending(n => n.Value).ToDictionary(k => k.Key, v => v.Value);
+        }
+
+
+        public static int DoublesCount(this List<Character> characters)
+        {
+            int result = 0;
+            for (int index = 0; index < characters.Count - 1; index++)
+            {
+                if (characters[index].GematriaIndex == characters[index + 1].GematriaIndex)
+                {
+                    result++;
+                }
+            }
+            return result;
         }
 
         public static Dictionary<Word, List<int>> NGramPairs(this List<Character> characters, int nGrams = 2)

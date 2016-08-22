@@ -28,6 +28,7 @@ namespace Solver
         static void Main(string[] args)
         {
             Initialize();
+            ProcessStats();
             System.Diagnostics.Debugger.Break();
         }
 
@@ -35,141 +36,62 @@ namespace Solver
         {
 
             sequences = oeisDB.Table<OeisRow>().ToArray();
-            List<Character> characters = @"..\DataSources\testdata.txt".CharactersFromFile();
             book.LoadFromFile(@"..\DataSources\liber-work");
-            for (int sectionIndx = 0; sectionIndx < book.Sections.Count - 2; sectionIndx++)
+        }
+
+        private class TestResult
+        {
+            public int OeisId { get; set; }
+            public int KeySize { get; set; }
+            public string Key { get; set; }
+            public int TextSize { get; set; }
+            public string Text { get; set; }
+            public int DoublesCount { get; set; }
+            public string IoCs { get; set; }
+        }
+        private static void ProcessStats()
+        {
+            List<Character> source = @"..\DataSources\geb.txt".CharactersFromFile();
+            ConcurrentBag<TestResult> results = new ConcurrentBag<TestResult>();
+            int sectionIndex = 0;
+            for (; sectionIndex < book.Sections.Count - 2; sectionIndex++)
             {
-                var doublesCount = book.Sections[sectionIndx].Characters.NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                var charactersCount = book.Sections[sectionIndx].Characters.Count;
+                int charactersCount = book.Sections[sectionIndex].Characters.Count;
+                int doublesCount = book.Sections[sectionIndex].Characters.DoublesCount();
                 int offset = 0;
-                while (offset < characters.Count - charactersCount)
+                while (offset < source.Count - charactersCount)
+
                 {
-                    var subCharacters = characters.Skip(offset).Take(charactersCount).AsWord();
-                    Parallel.For(0, sequences.Length, seqIndex =>
+                    var sampleCharacters = source.Skip(offset).Take(charactersCount).ToList();
+                    Parallel.For(0, sequences.Length, sequenceIndex =>
                     {
-                        var result = Ciphers.EncodeVigenereSerial(sequences[seqIndex].CacheValueOfSize(charactersCount), subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        if (result <= doublesCount)
+                        var sequence = sequences[sequenceIndex];
+                        var key = sequence.CacheValueOfSize(charactersCount);
+                        var sampleResult = Ciphers.EncodeVigenereSerial(key, sampleCharacters);
+                        var sampleDoublesCount = sampleResult.DoublesCount();
+                        var testIoc = sampleResult.ToIoC()[0];
+                        if (sampleDoublesCount <= doublesCount && testIoc < 1.1)
                         {
-                            lock (syncRoot)
+                            var iocs = sampleResult.ToIoCTable().Select(r => "(" + r.Key + "=" + r.Value + ")").ToList();
+                            results.Add(new TestResult
                             {
-                                string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:+\r\nText:{2}\r\nDoubles:{3}\r\n",
-                                    sequences[seqIndex].OeisId,
-                                    String.Join("-", sequences[seqIndex].CacheValueOfSize(charactersCount)),
-                                    String.Join("", subCharacters.Runes),
-                                    result);
-                                File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                            }
+                                OeisId = sequence.OeisId,
+                                KeySize = key.Length,
+                                Key = String.Join(",", key),
+                                TextSize = charactersCount,
+                                Text = sampleCharacters.AsWord().Runes,
+                                DoublesCount = sampleDoublesCount,
+                                IoCs = String.Join(",", iocs)
+                            });
                         }
-
-                        //result = Ciphers.DecodeVigenere(key, subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:-\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", subCharacters.Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-
-                        //result = Ciphers.EncodeVigenere(key, !subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:!+\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", (!subCharacters).AsWord().Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-                        //result = Ciphers.DecodeVigenere(!key, subCharacters).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:!-\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", (!subCharacters).AsWord().Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-
-
-                        //result = Ciphers.EncodeVigenere(key, subCharacters.Reverced).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:rev+\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", subCharacters.Reverced.Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-                        //result = Ciphers.DecodeVigenere(key, subCharacters.Reverced).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:rev-\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", subCharacters.Reverced.Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-
-                        //result = Ciphers.EncodeVigenere(key, !subCharacters.Reverced).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:!rev+\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", (!subCharacters.Reverced).AsWord().Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-                        //result = Ciphers.DecodeVigenere(key, !subCharacters.Reverced).NGramCount().Where(k => k.Key[0].GematriaIndex == k.Key[1].GematriaIndex).Select(s => s.Value).Sum();
-                        //if (result <= doublesCount)
-                        //{
-                        //    lock (syncRoot)
-                        //    {
-                        //        string output = String.Format("\r\nOEIS: {0}\r\nKey:{1}\r\nOperation:!rev-\r\nText:{2}\r\nDoubles:{3}\r\n",
-                        //            sequences[seqIndex].OeisId,
-                        //            String.Join("-", key),
-                        //            String.Join("", (!subCharacters.Reverced).AsWord().Runes),
-                        //            result);
-                        //        File.AppendAllText(@"..\Results\oeisLowDoubles.txt", output);
-                        //    }
-                        //}
-
-
                     });
                     offset += charactersCount;
                 }
             }
-        }
 
+            var res = results.OrderByDescending(r => r.DoublesCount).ToList();
+            File.WriteAllText(@"..\Results\TestForDoublesGEB.txt", JsonConvert.SerializeObject(res));
+        }
 
         private static void Processor()
         {
