@@ -29,7 +29,7 @@ namespace DataModels
             {
                 if (String.IsNullOrWhiteSpace(_inLatin))
                 {
-                    _inLatin = String.Join("-", this.Select(c => c.Latin));
+                    _inLatin = String.Join("", this.Select(c => c.Latin));
                 }
                 return _inLatin;
             }

@@ -51,13 +51,17 @@ namespace Solver
         }
         private static void ProcessStats()
         {
-            List<Character> source = @"..\DataSources\geb.txt".CharactersFromFile();
+            List<Character> source = @"..\DataSources\Koans.txt".CharactersFromFile();
             ConcurrentBag<TestResult> results = new ConcurrentBag<TestResult>();
-            int sectionIndex = 0;
-            for (; sectionIndex < book.Sections.Count - 2; sectionIndex++)
+            int sectionIndex = 1;
+            int previousCount = 0;
+            for (; sectionIndex < book.Sections.Count - 3; sectionIndex++)
             {
                 int charactersCount = book.Sections[sectionIndex].Characters.Count;
                 int doublesCount = book.Sections[sectionIndex].Characters.DoublesCount();
+                var iocTable = book.Sections[sectionIndex].Characters.ToIoCTable();
+                double minIoC = iocTable.Select(v => v.Value).Min();
+                double maxIoC = iocTable.Select(v => v.Value).Max();
                 int offset = 0;
                 while (offset < source.Count - charactersCount)
                 {
@@ -69,10 +73,10 @@ namespace Solver
                         var sampleResult = Ciphers.EncodeVigenereSerial(key, sampleCharacters);
                         var sampleDoublesCount = sampleResult.DoublesCount();
                         var testIoc = sampleResult.ToIoC()[0];
-                        if (sampleDoublesCount <= doublesCount && testIoc < 1.1)
+                        if (sampleDoublesCount <= doublesCount && testIoc <= maxIoC)
                         {
                             var iocsTable = sampleResult.ToIoCTable();
-                            if (!iocsTable.Any(v => v.Value > 1.2))
+                            if (!iocsTable.Any(v => v.Value < minIoC || v.Value > maxIoC))
                             {
                                 var iocs = iocsTable.Select(r => "(" + r.Key + "=" + r.Value + ")").ToList();
                                 results.Add(new TestResult
@@ -89,11 +93,14 @@ namespace Solver
                         }
                     });
                     offset += charactersCount;
+                    if (previousCount < results.Count)
+                    {
+                        var res = results.OrderBy(r => r.DoublesCount).ToList();
+                        File.WriteAllText(@"..\Results\TestForDoubles.txt", JsonConvert.SerializeObject(res, Formatting.Indented));
+                        previousCount = results.Count;
+                    }
                 }
             }
-
-            var res = results.OrderByDescending(r => r.DoublesCount).ToList();
-            File.WriteAllText(@"..\Results\TestForDoublesGEB.txt", JsonConvert.SerializeObject(res));
         }
 
         private static void Processor()

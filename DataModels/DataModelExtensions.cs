@@ -15,7 +15,7 @@ namespace DataModels
             return File.ReadAllLines(path).Select(line =>
             {
                 Sentence sentence = new Sentence();
-                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] words = line.ToUpper().Replace("-", "").Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var word in words)
                 {
                     if (word.Length == 1 && !(word == "A" || word == "I"))
@@ -33,7 +33,7 @@ namespace DataModels
             List<Word> output = new List<Word>();
             File.ReadAllLines(path).Select(line =>
             {
-                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] words = line.ToUpper().Replace("-", "").Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var word in words)
                 {
                     if (word.Length == 1 && !(word == "A" || word == "I"))
@@ -52,7 +52,7 @@ namespace DataModels
             List<Character> output = new List<Character>();
             File.ReadAllLines(path).Select(line =>
             {
-                string[] words = line.ToUpper().Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '-', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] words = line.ToUpper().Replace("-", "").Replace("'", "").Split(new char[] { ' ', '.', ',', ';', '"', '(', ')', '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var word in words)
                 {
                     if (word.Length == 1 && !(word == "A" || word == "I"))
@@ -66,6 +66,12 @@ namespace DataModels
             return output;
         }
 
+        public static Sentence ToSentence(this string sentence)
+        {
+            Sentence output = new Sentence();
+            output.AddRange(sentence.Split(' ').Select(w => w.ToWord()));
+            return output;
+        }
 
         public static Word ToWord(this string word)
         {

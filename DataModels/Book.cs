@@ -166,20 +166,15 @@ namespace DataModels
                             break;
 
                         case '\'':
-
-                            /*character = new Character { Type = CharacterType.Rune, Rune = c };
-                            currentLine.Add(character);
-                            currentWord.Add(character);*/
-                            /*
                             if (currentWord.Count > 0)
                                 currentSentance.Add(currentWord);
 
                             currentWord = new Word();
-                            character = new Character { Type = CharacterType.DoubleQuote, Rune = '"' };
+                            character = new Character { Type = CharacterType.SingleQuote, Rune = '"' };
                             currentWord.Add(character);
                             currentLine.Add(character);
                             currentSentance.Add(currentWord);
-                            currentWord = new Word();*/
+                            currentWord = new Word();
                             break;
 
                         case '"':
